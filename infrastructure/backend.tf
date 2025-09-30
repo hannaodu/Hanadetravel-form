@@ -1,6 +1,6 @@
 # resrouces
 locals {
-  prefix = "Hanadetravelease-contact"
+  prefix = "Hanadetravel-form"
 }
 
 # 1. S3 Bucket for website (The House)
@@ -60,7 +60,7 @@ resource "aws_dynamodb_table" "submissions" {
   }
 
   tags = {
-    Project = "HanadeTravelEase Contact Form"
+    Project = "HanadeTravel Contact Form"
   }
 }
 
