@@ -1,9 +1,10 @@
 {
-  "name": "hanadetravelease-contact-lambda",
+  "name": "hanadetravel-form-handler",
   "version": "1.0.0",
-  "description": "Lambda function for HanadeTravelEase contact form",
+  "description": "Contact form handler for Hanade Travel",
   "main": "index.js",
   "dependencies": {
-    "aws-sdk": "^2.1467.0"
+    "@aws-sdk/client-dynamodb": "^3.490.0",
+    "@aws-sdk/client-ses": "^3.490.0"
   }
 }

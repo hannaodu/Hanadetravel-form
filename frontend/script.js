@@ -26,13 +26,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
     try {
       // TODO:  API Gateway URL 
-      const response = await fetch("YOUR_API_GATEWAY_URL_HERE", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch(
+        "https://z9jnhfc9xd.execute-api.eu-west-2.amazonaws.com/production/contact",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
 
       const result = await response.json();
 

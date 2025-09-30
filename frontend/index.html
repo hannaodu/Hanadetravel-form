@@ -4,57 +4,198 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HanadeTravel - Contact Us</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        .contact-form {
+            padding: 40px;
+        }
+        .contact-form h2 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.8em;
+        }
+        .contact-form > p {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 16px;
+            font-family: Arial, sans-serif !important;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            font-family: Arial, sans-serif;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        button:hover { transform: translateY(-2px); }
+        #responseMessage {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>✈️ HanadeTravel</h1>
-            <p>Your journey begins with us</p>
+            <h1>HanadeTravel</h1>
+            <p>Your Journey to Extraordinary Adventures Begins Here</p>
         </header>
+        
+        <section class="contact-form">
+            <h2>Get in Touch</h2>
+            <p>Questions about your dream destination? We'd love to hear from you!</p>
+            
+            <form id="contactForm">
+                <div class="form-group">
+                    <label for="name">Full Name *</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
 
-        <main>
-            <div class="contact-form">
-                <h2>Get in Touch</h2>
-                <p>Have questions about your dream vacation? We'd love to hear from you!</p>
-                
-                <form id="contactForm">
-                    <div class="form-group">
-                        <label for="name">Full Name *</label>
-                        <input type="text" id="name" name="name" required>
-                    </div>
+                <div class="form-group">
+                    <label for="email">Email Address *</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
 
-                    <div class="form-group">
-                        <label for="email">Email Address *</label>
-                        <input type="email" id="email" name="email" required>
-                    </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone">
+                </div>
 
-                    <div class="form-group">
-                        <label for="phone">Phone Number</label>
-                        <input type="tel" id="phone" name="phone">
-                    </div>
+                <div class="form-group">
+                    <label for="destination">Dream Destination</label>
+                    <input type="text" id="destination" name="destination" placeholder="Where do you want to go?">
+                </div>
 
-                    <div class="form-group">
-                        <label for="destination">Dream Destination</label>
-                        <input type="text" id="destination" name="destination" placeholder="Where do you want to go?">
-                    </div>
+                <div class="form-group">
+                    <label for="message">Your Message *</label>
+                    <textarea id="message" name="message" rows="5" required placeholder="Tell us about your travel plans..."></textarea>
+                </div>
 
-                    <div class="form-group">
-                        <label for="message">Your Message *</label>
-                        <textarea id="message" name="message" rows="5" required placeholder="Tell us about your travel plans..."></textarea>
-                    </div>
+                <button type="submit" id="submitBtn">
+                    <span class="btn-text">Send Message</span>
+                    <span class="btn-loading" style="display: none;">Sending...</span>
+                </button>
+            </form>
 
-                    <button type="submit" id="submitBtn">
-                        <span class="btn-text">Send Message</span>
-                        <span class="btn-loading" style="display: none;">Sending...</span>
-                    </button>
-                </form>
-
-                <div id="messageArea" style="display: none;"></div>
-            </div>
-        </main>
+            <div id="responseMessage"></div>
+        </section>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        // Your existing script.js content goes here
+        document.getElementById('contactForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = submitBtn.querySelector('.btn-text');
+            const btnLoading = submitBtn.querySelector('.btn-loading');
+            const responseMessage = document.getElementById('responseMessage');
+
+            // Show loading state
+            btnText.style.display = 'none';
+            btnLoading.style.display = 'inline';
+            submitBtn.disabled = true;
+            responseMessage.textContent = '';
+            responseMessage.className = '';
+
+            const formData = {
+                name: document.getElementById("name").value,
+                email: document.getElementById("email").value,
+                phone: document.getElementById("phone").value,
+                destination: document.getElementById("destination").value,
+                message: document.getElementById("message").value,
+            };
+
+            try {
+                const response = await fetch('https://z9jnhfc9xd.execute-api.eu-west-2.amazonaws.com/production/contact', {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(formData),
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    responseMessage.textContent = "Thank you! Your message has been sent successfully. We'll get back to you soon!";
+                    responseMessage.style.color = "green";
+                    document.getElementById("contactForm").reset();
+                } else {
+                    responseMessage.textContent = result.message || "Sorry, there was an error sending your message. Please try again.";
+                    responseMessage.style.color = "red";
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                responseMessage.textContent = "Network error. Please check your connection and try again.";
+                responseMessage.style.color = "red";
+            } finally {
+                // Reset button state
+                btnText.style.display = 'inline';
+                btnLoading.style.display = 'none';
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
 </body>
 </html>

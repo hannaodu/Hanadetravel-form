@@ -1,14 +1,24 @@
-# infrastructure/main.tf
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
+provider "aws" {
+  region = "eu-west-2"
+}
+
 locals {
   prefix = "hanadetravel-form"
 }
 
-# 1. S3 Bucket Website (The House) 
 resource "aws_s3_bucket" "website" {
-  bucket = lower("${local.prefix}-website-${random_id.suffix.hex}")
+  bucket = "${local.prefix}-website-${random_id.suffix.hex}"
 }
 
-# Make the bucket publicly readable for website hosting
 resource "aws_s3_bucket_website_configuration" "website" {
   bucket = aws_s3_bucket.website.id
 
@@ -21,7 +31,6 @@ resource "aws_s3_bucket_website_configuration" "website" {
   }
 }
 
-# Allow public read access to the bucket
 resource "aws_s3_bucket_public_access_block" "website" {
   bucket = aws_s3_bucket.website.id
 
@@ -31,7 +40,6 @@ resource "aws_s3_bucket_public_access_block" "website" {
   restrict_public_buckets = false
 }
 
-# Policy to allow public read access
 resource "aws_s3_bucket_policy" "website" {
   bucket = aws_s3_bucket.website.id
 
@@ -48,7 +56,6 @@ resource "aws_s3_bucket_policy" "website" {
   })
 }
 
-# 2. DynamoDB Table (The Filing Cabinet for form submissions)
 resource "aws_dynamodb_table" "submissions" {
   name           = "${local.prefix}-submissions"
   billing_mode   = "PAY_PER_REQUEST"
@@ -58,13 +65,8 @@ resource "aws_dynamodb_table" "submissions" {
     name = "submissionId"
     type = "S"
   }
-
-  tags = {
-    Project = "TravelEase Contact Form"
-  }
 }
 
-# 3. Lambda Function (The Brain that processes forms)
 resource "aws_lambda_function" "contact_form" {
   filename      = "function.zip"
   function_name = "${local.prefix}-handler"
@@ -75,14 +77,13 @@ resource "aws_lambda_function" "contact_form" {
 
   environment {
     variables = {
-      TABLE_NAME    = aws_dynamodb_table.submissions.name
-      SENDER_EMAIL  = var.sender_email
-      BUSINESS_EMAIL = var.business_email
+      TABLE_NAME     = aws_dynamodb_table.submissions.name
+      SENDER_EMAIL   = var.sender_email          
+      BUSINESS_EMAIL = var.business_email 
     }
   }
 }
 
-# 4. API Gateway (The Doorbell that receives form submissions)
 resource "aws_apigatewayv2_api" "contact_api" {
   name          = "${local.prefix}-api"
   protocol_type = "HTTP"
@@ -93,7 +94,6 @@ resource "aws_apigatewayv2_api" "contact_api" {
   }
 }
 
-# Connect API Gateway to Lambda
 resource "aws_apigatewayv2_integration" "lambda_integration" {
   api_id           = aws_apigatewayv2_api.contact_api.id
   integration_type = "AWS_PROXY"
@@ -102,21 +102,18 @@ resource "aws_apigatewayv2_integration" "lambda_integration" {
   integration_uri    = aws_lambda_function.contact_form.invoke_arn
 }
 
-# Create the route that receives form submissions
 resource "aws_apigatewayv2_route" "contact_route" {
   api_id    = aws_apigatewayv2_api.contact_api.id
   route_key = "POST /contact"
   target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
 }
 
-# Deploy the API
 resource "aws_apigatewayv2_stage" "production" {
   api_id      = aws_apigatewayv2_api.contact_api.id
   name        = "production"
   auto_deploy = true
 }
 
-# 5. IAM Roles (Security Permissions)
 resource "aws_iam_role" "lambda_role" {
   name = "${local.prefix}-lambda-role"
 
@@ -134,7 +131,6 @@ resource "aws_iam_role" "lambda_role" {
   })
 }
 
-# Allow Lambda to write to DynamoDB and send emails
 resource "aws_iam_role_policy" "lambda_policy" {
   name = "${local.prefix}-lambda-policy"
   role = aws_iam_role.lambda_role.id
@@ -171,12 +167,10 @@ resource "aws_iam_role_policy" "lambda_policy" {
   })
 }
 
-# 6. Random suffix for unique resource names
 resource "random_id" "suffix" {
   byte_length = 4
 }
 
-# 7. Verify SES Email Addresses
 resource "aws_ses_email_identity" "sender" {
   email = var.sender_email
 }
@@ -185,9 +179,8 @@ resource "aws_ses_email_identity" "business" {
   email = var.business_email
 }
 
-# Outputs - These will show after deployment
 output "website_url" {
-  value = "http://${aws_s3_bucket.website.bucket}.s3-website-${var.aws_region}.amazonaws.com"
+  value = "http://${aws_s3_bucket.website.bucket}.s3-website-eu-west-2.amazonaws.com"
 }
 
 output "api_url" {
@@ -197,6 +190,3 @@ output "api_url" {
 output "s3_bucket_name" {
   value = aws_s3_bucket.website.bucket
 }
-
-
-
